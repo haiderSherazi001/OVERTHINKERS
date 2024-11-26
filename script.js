@@ -2,6 +2,7 @@
 const submitButton = document.getElementById("submitButton");
 const thoughtInput = document.getElementById("thoughtInput");
 const thoughtsContainer = document.getElementById("thoughtsContainer");
+const clearThoughtsButton = document.getElementById("clearThoughtsButton");
 
 // Function to create a new thought card and add it to the display
 function displayThought(thought) {
@@ -18,6 +19,20 @@ function displayThought(thought) {
   thoughtsContainer.appendChild(thoughtCard);
 }
 
+// Function to save all thoughts to local storage
+function saveThoughtsToLocalStorage() {
+  const thoughts = Array.from(thoughtsContainer.children).map(
+    (card) => card.textContent
+  );
+  localStorage.setItem("thoughts", JSON.stringify(thoughts));
+}
+
+// Function to load thoughts from local storage
+function loadThoughtsFromLocalStorage() {
+  const savedThoughts = JSON.parse(localStorage.getItem("thoughts")) || [];
+  savedThoughts.forEach(displayThought);
+}
+
 // Event listener for the submit button
 submitButton.addEventListener("click", function () {
   const newThought = thoughtInput.value.trim();
@@ -25,6 +40,7 @@ submitButton.addEventListener("click", function () {
   // Check if the input is not empty
   if (newThought) {
     displayThought(newThought); // Display the thought
+    saveThoughtsToLocalStorage(); // Save thoughts to local storage
     thoughtInput.value = ""; // Clear the input field
   } else {
     alert("Please write something before submitting!");
@@ -38,29 +54,11 @@ thoughtInput.addEventListener("keydown", function (e) {
     submitButton.click(); // Trigger the click event of the submit button
   }
 });
-const clearThoughtsButton = document.getElementById("clearThoughtsButton");
 
+// Event listener for the "Clear All Thoughts" button
 clearThoughtsButton.addEventListener("click", () => {
   thoughtsContainer.innerHTML = ""; // Clear all thoughts
-});
-
-function saveThoughtsToLocalStorage() {
-  const thoughts = Array.from(thoughtsContainer.children).map(
-    (card) => card.textContent
-  );
-  localStorage.setItem("thoughts", JSON.stringify(thoughts));
-}
-
-function loadThoughtsFromLocalStorage() {
-  const savedThoughts = JSON.parse(localStorage.getItem("thoughts")) || [];
-  savedThoughts.forEach(displayThought);
-}
-
-// Call this function when a new thought is added
-submitButton.addEventListener("click", function () {
-  if (thoughtInput.value.trim()) {
-    saveThoughtsToLocalStorage();
-  }
+  localStorage.removeItem("thoughts"); // Clear saved thoughts in local storage
 });
 
 // Load thoughts on page load
